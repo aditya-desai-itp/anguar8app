@@ -1,0 +1,42 @@
+<div class="page-head">
+  <div>
+    <h1>Welcome back, {{ (auth.user$ | async)?.name }}</h1>
+    <p class="text-muted mb-0">{{ today | date: 'fullDate' }} · Plant 1</p>
+  </div>
+</div>
+
+<ng-container *ngIf="view$ | async as v; else loading">
+  <div class="row">
+    <div class="col-6 col-lg-3 mb-3"><div class="kpi"><span>Inventory value (at cost)</span><b>{{ v.inventoryValue | currency: 'USD':'symbol':'1.0-0' }}</b></div></div>
+    <div class="col-6 col-lg-3 mb-3"><div class="kpi"><span>Open orders</span><b>{{ v.openOrders }}</b></div></div>
+    <div class="col-6 col-lg-3 mb-3"><div class="kpi" [class.alert-kpi]="v.reorder.length"><span>Items at or below reorder</span><b>{{ v.reorder.length }}</b></div></div>
+    <div class="col-6 col-lg-3 mb-3"><div class="kpi"><span>Open orders due within 7 days</span><b>{{ v.dueThisWeek }}</b></div></div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between"><strong>Reorder alerts</strong><a routerLink="/stock">View stock</a></div>
+        <div class="list-group list-group-flush">
+          <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between" *ngFor="let p of v.reorder" (click)="open(p)">
+            <span>{{ p.name }} <small class="text-muted mono">{{ p.sku }}</small></span>
+            <span class="mono">{{ p.stock | number }} / {{ p.minLevel | number }}</span>
+          </button>
+          <div class="list-group-item text-muted" *ngIf="!v.reorder.length">Everything is above its reorder level.</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between"><strong>Recent stock movements</strong><a routerLink="/stock">All movements</a></div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between" *ngFor="let m of v.movements">
+            <span><span class="mono">{{ m.sku }}</span> · {{ m.type }} <small class="text-muted">{{ m.note }}</small></span>
+            <span class="mono">{{ m.qty > 0 ? '+' : '' }}{{ m.qty | number }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<ng-template #loading><p class="text-muted">Loading…</p></ng-template>

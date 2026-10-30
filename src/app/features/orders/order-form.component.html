@@ -1,0 +1,56 @@
+<div class="modal-header">
+  <div>
+    <h5 class="modal-title">New order</h5>
+    <small class="text-muted">The order starts in status New</small>
+  </div>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()"><span aria-hidden="true">&times;</span></button>
+</div>
+
+<div class="modal-body">
+  <form id="order-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div class="form-row">
+      <div class="form-group col-md-7">
+        <label for="of-customer">Customer</label>
+        <input id="of-customer" class="form-control" formControlName="customer" [class.is-invalid]="form.get('customer')!.invalid && form.get('customer')!.touched">
+        <div class="invalid-feedback">Enter a customer name.</div>
+      </div>
+      <div class="form-group col-md-5">
+        <label for="of-due">Due date</label>
+        <div class="input-group">
+          <input id="of-due" class="form-control" placeholder="yyyy-mm-dd" formControlName="due" ngbDatepicker #d="ngbDatepicker"
+                 [class.is-invalid]="form.get('due')!.invalid && form.get('due')!.touched">
+          <div class="input-group-append">
+            <button type="button" class="btn btn-outline-secondary" aria-label="Open calendar" (click)="d.toggle()">&#128197;</button>
+          </div>
+          <div class="invalid-feedback">Pick a due date.</div>
+        </div>
+      </div>
+    </div>
+
+    <h6 class="text-muted text-uppercase small">Lines</h6>
+    <div formArrayName="lines">
+      <div class="form-row align-items-end mb-2" *ngFor="let line of lines.controls; let i = index" [formGroupName]="i">
+        <div class="col-8 col-md-9">
+          <label [attr.for]="'of-sku-' + i" class="small text-muted mb-1">Product</label>
+          <select [id]="'of-sku-' + i" class="custom-select" formControlName="sku">
+            <option value="" disabled>Choose a product</option>
+            <option *ngFor="let p of products" [value]="p.sku">{{ p.sku }} · {{ p.name }}</option>
+          </select>
+        </div>
+        <div class="col-3 col-md-2">
+          <label [attr.for]="'of-qty-' + i" class="small text-muted mb-1">Qty</label>
+          <input [id]="'of-qty-' + i" type="number" min="1" class="form-control" formControlName="qty">
+        </div>
+        <div class="col-1">
+          <button type="button" class="btn btn-outline-secondary" [disabled]="lines.length === 1" (click)="removeLine(i)" aria-label="Remove line">&times;</button>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLine()">Add line</button>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancel</button>
+  <button type="submit" form="order-form" class="btn btn-primary" [disabled]="saving">Create order</button>
+</div>

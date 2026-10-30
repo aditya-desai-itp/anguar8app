@@ -1,0 +1,13 @@
+<ag-grid-angular
+  class="ag-theme-bootstrap"
+  domLayout="autoHeight"
+  [columnDefs]="colDefs"
+  [rowData]="rows"
+  [pagination]="true"
+  [paginationPageSize]="pageSize"
+  [overlayNoRowsTemplate]="noRowsTemplate"
+  (gridReady)="fit($event)"
+  (gridSizeChanged)="fit($event)"
+  (rowClicked)="onRowClicked($event)"
+  (cellKeyDown)="onCellKeyDown($event)">
+</ag-grid-angular>

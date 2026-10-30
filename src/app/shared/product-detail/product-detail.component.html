@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <div>
+    <h5 class="modal-title">{{ product.name }}</h5>
+    <small class="text-muted">{{ product.sku }} · {{ product.category }}</small>
+  </div>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()"><span aria-hidden="true">&times;</span></button>
+</div>
+
+<div class="modal-body">
+  <div class="dl mb-3">
+    <div><span>On hand</span><b class="mono">{{ product.stock | number }} {{ product.unit }}</b></div>
+    <div><span>Reorder at</span><b class="mono">{{ product.minLevel | number }}</b></div>
+    <div><span>Bin</span><b class="mono">{{ product.bin }}</b></div>
+    <div><span>Unit cost</span><b class="mono">{{ product.cost | currency }}</b></div>
+    <div><span>Unit price</span><b class="mono">{{ product.price | currency }}</b></div>
+    <div><span>Supplier</span><b>{{ product.supplier }}</b></div>
+  </div>
+
+  <div class="mb-3">
+    <span class="pill" [ngClass]="state === 'ok' ? 'ok' : state === 'low' ? 'warn' : 'bad'">
+      {{ state === 'ok' ? 'In stock' : state === 'low' ? 'Low' : 'Out of stock' }}
+    </span>
+    <small class="text-muted"> {{ levelPct }}% of max level ({{ product.maxLevel | number }})</small>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="apply()" class="form-row align-items-end" id="adjust-form">
+    <div class="form-group col-sm-4 mb-0">
+      <label for="adj-qty">Adjust by (+ or -)</label>
+      <input id="adj-qty" type="number" class="form-control" formControlName="qty" (focus)="$any($event.target).select()">
+    </div>
+    <div class="form-group col-sm-8 mb-0">
+      <label for="adj-note">Reason</label>
+      <input id="adj-note" type="text" class="form-control" formControlName="note">
+    </div>
+  </form>
+  <p class="text-muted small mt-2 mb-0" *ngIf="!auth.isManager">Viewers cannot adjust stock.</p>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Close</button>
+  <button type="submit" form="adjust-form" class="btn btn-primary" [disabled]="!auth.isManager || form.invalid || saving">Apply</button>
+</div>

@@ -1,0 +1,90 @@
+// Loaded after Bootstrap and the ag-Grid theme (see angular.json). Only app-specific look lives here.
+:root {
+  --steel: #2b4a5e;
+  --steel-dark: #213a4a;
+  --accent: #d98a00;
+  --ok: #2f7d4f; --ok-soft: #dcefe3;
+  --warn: #8a5300; --warn-soft: #fbefd2;
+  --bad: #b3372f; --bad-soft: #f6dedb;
+  --info: #2b4a5e; --info-soft: #dde8f0;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+body {
+  background: #eef0f2;
+  color: #1c2a33;
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+h1 { font-size: 1.5rem; font-weight: 600; margin: 0; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+// Bootstrap primary recoloured to the steel blue
+a { color: var(--steel); }
+.btn-primary { background: var(--steel); border-color: var(--steel); }
+.btn-primary:hover, .btn-primary:focus { background: var(--steel-dark); border-color: var(--steel-dark); }
+.btn-primary:disabled { background: var(--steel); border-color: var(--steel); }
+.btn-outline-primary { color: var(--steel); border-color: var(--steel); }
+.btn-outline-primary:hover { background: var(--steel); border-color: var(--steel); }
+.custom-control-input:checked ~ .custom-control-label::before { background: var(--steel); border-color: var(--steel); }
+.modal-content { border-top: 4px solid var(--accent); }
+
+// brand mark and login
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1.15rem; }
+.brand i { width: 22px; height: 22px; background: var(--accent); display: inline-block; clip-path: polygon(0 0, 100% 0, 100% 60%, 60% 100%, 0 100%); }
+.login-card { max-width: 400px; margin: 8vh auto 0; }
+
+// shell: side nav + content
+.app { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; max-width: 1200px; margin: 0 auto; padding: 16px; align-items: start; }
+.side-nav { position: sticky; top: 16px; display: flex; flex-direction: column; padding: 16px 0; background: var(--steel); color: #fff; }
+.side-nav .brand { padding: 0 16px 16px; }
+.side-nav a { display: block; padding: 9px 16px; color: #fff; text-decoration: none; border-left: 3px solid transparent; opacity: .8; }
+.side-nav a:hover { opacity: 1; background: rgba(255, 255, 255, .08); }
+.side-nav a.active { opacity: 1; border-left-color: var(--accent); background: rgba(255, 255, 255, .12); }
+.side-nav .who { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; padding: 12px 16px 0; border-top: 1px solid rgba(255, 255, 255, .2); font-size: .8rem; }
+main { display: flex; flex-direction: column; min-width: 0; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+
+// dashboard tiles
+.kpi { display: flex; flex-direction: column; height: 100%; padding: 14px 16px; background: #fff; border: 1px solid rgba(0, 0, 0, .125); border-radius: .25rem; }
+.kpi b { font: 500 1.7rem var(--mono); }
+.kpi span { color: #5d6b75; font-size: .8rem; }
+.kpi.alert-kpi b { color: var(--bad); }
+
+// status pills and stock bars (used in ag-Grid cell renderers and templates)
+.pill { display: inline-block; padding: 0 9px; border-radius: 10px; font-size: .8rem; font-weight: 500; line-height: 1.5; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.info { background: var(--info-soft); color: var(--info); }
+.bar { display: inline-block; width: 80px; height: 6px; margin-right: 8px; vertical-align: middle; background: #d5dade; }
+.bar i { display: block; height: 100%; background: var(--ok); }
+.bar.mid i { background: var(--accent); }
+.bar.low i { background: var(--bad); }
+
+// ag-Grid tweaks
+app-grid { display: block; }
+ag-grid-angular { width: 100%; }
+.ag-theme-bootstrap { font-family: inherit; }
+.ag-theme-bootstrap .ag-row { cursor: pointer; }
+.ag-theme-bootstrap .ag-header-cell-label { text-transform: uppercase; font-size: .72rem; letter-spacing: .05em; color: #5d6b75; }
+.ag-theme-bootstrap .ag-cell { display: flex; align-items: center; }
+.ag-theme-bootstrap .ag-right-aligned-cell { justify-content: flex-end; }
+
+// modal bodies
+.dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.dl div { display: flex; flex-direction: column; }
+.dl span { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: #5d6b75; }
+.steps { display: flex; gap: 4px; }
+.steps div { flex: 1; padding: 6px 4px; text-align: center; font-size: .75rem; background: #d5dade; color: #5d6b75; }
+.steps div.done { background: var(--steel); color: #fff; }
+.steps div.cur { background: var(--accent); color: #1c2a33; font-weight: 600; }
+
+.toast-host { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 1100; }
+
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .side-nav { position: static; flex-direction: row; flex-wrap: wrap; padding: 8px; }
+  .side-nav .brand, .side-nav .who { display: none; }
+  .side-nav a { padding: 8px 12px; border-left: 0; border-bottom: 3px solid transparent; }
+  .side-nav a.active { border-bottom-color: var(--accent); }
+}

@@ -1,0 +1,36 @@
+<div class="modal-header">
+  <div>
+    <h5 class="modal-title">{{ orderNo }}</h5>
+    <small class="text-muted">{{ order ? order.customer + ' · due ' + order.due : 'Loading…' }}</small>
+  </div>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()"><span aria-hidden="true">&times;</span></button>
+</div>
+
+<div class="modal-body" *ngIf="order">
+  <div class="steps mb-3" *ngIf="order.status !== 'Cancelled'; else cancelled">
+    <div *ngFor="let s of flow; let i = index" [ngClass]="stepClass(i)">{{ s }}</div>
+  </div>
+  <ng-template #cancelled><p><span class="pill bad">Cancelled</span></p></ng-template>
+
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead><tr><th>SKU</th><th>Item</th><th class="text-right">Qty</th><th class="text-right">Value</th><th></th></tr></thead>
+      <tbody>
+        <tr *ngFor="let l of order.lines">
+          <td class="mono">{{ l.sku }}</td>
+          <td>{{ l.name }}</td>
+          <td class="text-right mono">{{ l.qty | number }}</td>
+          <td class="text-right mono">{{ l.qty * l.price | currency }}</td>
+          <td><span *ngIf="isShort(l)" class="pill bad">Short: {{ l.onHand | number }} on hand</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="text-right mono font-weight-bold mt-2">Total {{ order.total | currency }}</div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Close</button>
+  <button type="button" class="btn btn-outline-danger" *ngIf="canCancel && auth.isManager" [disabled]="busy" (click)="cancel()">Cancel order</button>
+  <button type="button" class="btn btn-primary" *ngIf="next && auth.isManager" [disabled]="busy" (click)="advance()">Move to {{ next }}</button>
+</div>

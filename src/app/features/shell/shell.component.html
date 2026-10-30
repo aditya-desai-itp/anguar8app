@@ -1,0 +1,13 @@
+<div class="app">
+  <nav class="side-nav" aria-label="Main">
+    <div class="brand"><i></i>Forge</div>
+    <a *ngFor="let l of links" [routerLink]="l.path" routerLinkActive="active">{{ l.label }}</a>
+    <div class="who" *ngIf="user$ | async as user">
+      <span>{{ user.name }} · {{ user.role }}</span>
+      <button type="button" class="btn btn-sm btn-outline-light" (click)="logout()">Sign out</button>
+      <button type="button" class="btn btn-sm btn-outline-light" (click)="resetDemo()" title="Restore the original sample data">Reset demo data</button>
+    </div>
+  </nav>
+  <main><router-outlet></router-outlet></main>
+</div>
+<app-toast></app-toast>

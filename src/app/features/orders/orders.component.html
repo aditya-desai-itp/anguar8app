@@ -1,0 +1,16 @@
+<div class="page-head">
+  <div>
+    <h1>Customer orders</h1>
+    <p class="text-muted mb-0">Click an order to review its lines and move it along.</p>
+  </div>
+  <div class="form-inline">
+    <select class="custom-select mr-2" [ngModel]="statusFilter" (ngModelChange)="setStatusFilter($event)" aria-label="Filter by status">
+      <option value="">All statuses</option>
+      <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+    </select>
+    <button type="button" class="btn btn-primary" [disabled]="!auth.isManager" (click)="create()">New order</button>
+  </div>
+</div>
+
+<p class="text-muted" *ngIf="loading">Loading…</p>
+<app-grid *ngIf="!loading" [columns]="columns" [rows]="rows" [pageSize]="6" (rowClick)="open($event)"></app-grid>

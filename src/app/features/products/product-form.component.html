@@ -1,0 +1,80 @@
+<div class="modal-header">
+  <div>
+    <h5 class="modal-title">New product</h5>
+    <small class="text-muted">SKU format: three capitals, a dash, four digits</small>
+  </div>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()"><span aria-hidden="true">&times;</span></button>
+</div>
+
+<div class="modal-body">
+  <form id="product-form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="pf-sku">SKU</label>
+        <input id="pf-sku" class="form-control" formControlName="sku" placeholder="BRK-1099" [class.is-invalid]="invalid('sku')">
+        <div class="invalid-feedback">Use the format ABC-1234.</div>
+      </div>
+      <div class="form-group col-md-8">
+        <label for="pf-name">Name</label>
+        <input id="pf-name" class="form-control" formControlName="name" [class.is-invalid]="invalid('name')">
+        <div class="invalid-feedback">Enter a name of up to 60 characters.</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="pf-category">Category</label>
+        <input id="pf-category" class="form-control" formControlName="category" list="pf-categories" [class.is-invalid]="invalid('category')">
+        <datalist id="pf-categories"><option *ngFor="let c of categories" [value]="c"></option></datalist>
+        <div class="invalid-feedback">Required.</div>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="pf-unit">Unit</label>
+        <select id="pf-unit" class="custom-select" formControlName="unit"><option>pcs</option><option>box/100</option><option>kg</option><option>m</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="pf-cost">Unit cost</label>
+        <input id="pf-cost" type="number" step="0.01" class="form-control" formControlName="cost" [class.is-invalid]="invalid('cost')">
+        <div class="invalid-feedback">Enter 0 or more.</div>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="pf-price">Unit price</label>
+        <input id="pf-price" type="number" step="0.01" class="form-control" formControlName="price" [class.is-invalid]="invalid('price')">
+        <div class="invalid-feedback">Enter 0 or more.</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="pf-stock">Opening stock</label>
+        <input id="pf-stock" type="number" class="form-control" formControlName="stock">
+      </div>
+      <div class="form-group col-md-4">
+        <label for="pf-min">Reorder at</label>
+        <input id="pf-min" type="number" class="form-control" formControlName="minLevel">
+      </div>
+      <div class="form-group col-md-4">
+        <label for="pf-max">Max level</label>
+        <input id="pf-max" type="number" class="form-control" formControlName="maxLevel" [class.is-invalid]="invalid('maxLevel')">
+        <div class="invalid-feedback">Enter 1 or more.</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-4">
+        <label for="pf-bin">Bin</label>
+        <input id="pf-bin" class="form-control" formControlName="bin" placeholder="A-01-1" [class.is-invalid]="invalid('bin')">
+        <div class="invalid-feedback">Required.</div>
+      </div>
+      <div class="form-group col-md-8">
+        <label for="pf-supplier">Supplier</label>
+        <input id="pf-supplier" class="form-control" formControlName="supplier" [class.is-invalid]="invalid('supplier')">
+        <div class="invalid-feedback">Required.</div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Cancel</button>
+  <button type="submit" form="product-form" class="btn btn-primary" [disabled]="saving">Add product</button>
+</div>

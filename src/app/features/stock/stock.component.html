@@ -1,0 +1,23 @@
+<div class="page-head">
+  <div>
+    <h1>Stock levels</h1>
+    <p class="text-muted mb-0">Bins, reorder points and the latest movements. Click a row to adjust.</p>
+  </div>
+  <div class="custom-control custom-switch">
+    <input id="only-low" type="checkbox" class="custom-control-input" [ngModel]="onlyLow" (ngModelChange)="setOnlyLow($event)">
+    <label class="custom-control-label" for="only-low">Show only items below reorder level</label>
+  </div>
+</div>
+
+<p class="text-muted" *ngIf="loading">Loading…</p>
+<app-grid *ngIf="!loading" [columns]="columns" [rows]="rows" [pageSize]="8" (rowClick)="open($event)"></app-grid>
+
+<div class="card mt-3">
+  <div class="card-header"><strong>Latest movements</strong></div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item d-flex justify-content-between" *ngFor="let m of movements">
+      <span><span class="mono">{{ m.ts }}</span> · <span class="mono">{{ m.sku }}</span> · {{ m.type }} <small class="text-muted">{{ m.note }}</small></span>
+      <span class="mono">{{ m.qty > 0 ? '+' : '' }}{{ m.qty | number }}</span>
+    </li>
+  </ul>
+</div>
