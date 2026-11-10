@@ -1,0 +1,124 @@
+name: E2E tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The full Playwright suite against the production build.
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1) Build the Angular 8 app. It needs Node 12 (see .nvmrc).
+      - name: Use Node 12 for the app build
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install app dependencies
+        run: npm ci
+      - name: Build app (production)
+        run: npx ng build --prod
+
+      # 2) Run Playwright against the built files. Playwright needs Node 18+.
+      #    This setup-node step puts Node 20 first on PATH for every step after it.
+      - name: Use Node 20 for Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: playwright/package-lock.json
+      - name: Install Playwright dependencies
+        working-directory: playwright
+        run: npm ci
+      - name: Install Playwright browser
+        working-directory: playwright
+        run: npx playwright install --with-deps chromium
+      - name: Run Playwright tests
+        working-directory: playwright
+        run: npx playwright test --project=chromium
+      - name: Write the test inventory
+        if: ${{ !cancelled() }}
+        working-directory: playwright
+        run: |
+          npm run inventory
+          sed -n '1,40p' docs/TEST-INVENTORY.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload HTML report (with a trace for every test)
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright/playwright-report/
+          retention-days: 14
+      - name: Upload test inventory
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-inventory
+          path: playwright/docs/TEST-INVENTORY.md
+          retention-days: 14
+
+  # The same suite against a source-mapped build, measuring which app code the tests run.
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node 12 for the app build
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install app dependencies
+        run: npm ci
+      - name: Build app with source maps
+        run: npx ng build --output-path dist/forge-inventory-cov
+
+      - name: Use Node 20 for Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: playwright/package-lock.json
+      - name: Install Playwright dependencies
+        working-directory: playwright
+        run: npm ci
+      - name: Install Playwright browser
+        working-directory: playwright
+        run: npx playwright install --with-deps chromium
+      - name: Run Playwright tests with code coverage
+        working-directory: playwright
+        env:
+          E2E_COVERAGE: '1'
+        run: npx playwright test --project=chromium
+      - name: Add the coverage summary to the run page
+        if: ${{ !cancelled() }}
+        working-directory: playwright
+        run: |
+          node -e "
+            const s = require('./coverage-report/coverage-summary.json').total;
+            const row = k => '| ' + k + ' | ' + s[k].pct + '% | ' + s[k].covered + ' / ' + s[k].total + ' |';
+            console.log(['## E2E code coverage (src/app)', '', '| Metric | Covered | Count |', '|---|---|---|',
+              ...['lines', 'statements', 'functions', 'branches'].map(row)].join('\n'));
+          " >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload coverage report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: playwright/coverage-report/
+          retention-days: 14

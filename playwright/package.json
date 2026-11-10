@@ -1,0 +1,21 @@
+{
+  "name": "forge-inventory-e2e",
+  "private": true,
+  "description": "Playwright end-to-end tests for Forge Inventory. Runs on Node 18+, against the built app in ../dist.",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed --project=chromium --workers=1",
+    "report": "playwright show-report",
+    "coverage": "scripts\\coverage.cmd",
+    "demo": "node scripts/run-demo.mjs",
+    "inventory": "node scripts/inventory.mjs",
+    "e2e:local": "powershell -ExecutionPolicy Bypass -File scripts/e2e-local.ps1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
+    "monocart-coverage-reports": "^3.2.1",
+    "serve": "^14.2.6"
+  }
+}
