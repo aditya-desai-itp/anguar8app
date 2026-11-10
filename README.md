@@ -20,6 +20,41 @@ ng build --prod
 Demo logins: `planner` / `factory123` (Manager) and `viewer` / `viewer123` (read only).
 "Reset demo data" in the side bar restores the seed data from `src/assets/seed.sql`.
 
+## End-to-end tests (Playwright)
+
+The Playwright suite is in [`playwright/`](playwright/), which has its own `package.json`.
+It runs in **headless Chromium** against the **built** app, not `ng serve`.
+The app needs Node 12 to build, and Playwright needs Node 18 or newer, so use two Command Prompt windows.
+
+```bat
+:: Window A: Node 12 (portable zip from nodejs.org, extracted to C:\tools\node12; this window only)
+set "PATH=C:\tools\node12\node-v12.22.12-win-x64;%PATH%"
+npm ci
+npx ng build --prod
+
+:: Window B: your normal Node 20+
+cd playwright
+npm ci
+npx playwright install chromium
+npx playwright test
+```
+
+| What | Command (in `playwright/`) |
+|---|---|
+| Whole suite | `npx playwright test` |
+| Smoke set only | `npx playwright test --grep @smoke` |
+| One area | `npx playwright test --grep @orders` |
+| HTML report (a trace for every test) | `npm run report` |
+| Watch in Edge, slowed down | `set PW_CHANNEL=msedge` then `set SLOWMO=500` then `npm run test:headed` |
+| Step through interactively | `npm run test:ui` |
+| Code coverage | build `dist/forge-inventory-cov` with Node 12 (`npx ng build --output-path dist/forge-inventory-cov`), then `scripts\coverage.cmd` → `coverage-report/index.html` |
+| Test count and inventory | `npm run inventory` → `docs/TEST-INVENTORY.md` |
+| Recorded, captioned demo video | `npm run demo` → `demo-video/forge-inventory-demo.webm` |
+
+- **Other options:** `E2E_PORT` picks another port; a server already running on that port (for example `npm start`) is used instead of the built files. `ALL_BROWSERS=1` adds Firefox and WebKit.
+- **Documentation:** [docs/COVERAGE-MATRIX.md](playwright/docs/COVERAGE-MATRIX.md) maps every feature and rule to its tests. [docs/DEMO-SCRIPT.md](playwright/docs/DEMO-SCRIPT.md) is a script for a recorded demo.
+- **CI:** `.github/workflows/e2e.yml` runs the suite and a code-coverage job on every push and pull request to `main`. It uploads the HTML report, the inventory and the coverage report.
+
 ## Layout
 
 ```
